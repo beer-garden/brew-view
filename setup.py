@@ -21,7 +21,7 @@ setup(
     author='The beer-garden Team',
     author_email=' ',
     license='MIT',
-    packages=(find_packages(exclude=['tests', 'tests.*'])),
+    packages=(find_packages(exclude=['test', 'test.*'])),
     package_data={
         '': ['*.txt', '*.js', '*.html', '*.css', '*.scss', '*.less', '*.otf', '*.eot', '*.svg', '*.gif', '*.png',
              '*.ttf', '*.woff', '*.woff2']
