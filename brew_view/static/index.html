@@ -7,6 +7,9 @@
     <link href="dist/vendor.css" rel="stylesheet">
     <link href="dist/index.css" rel="stylesheet">
     <link ng-if="themes.slate" ng-href="dist/dark.css" rel="stylesheet">
+
+    <!-- Favicon -->
+    <link ng-if="config.icon_default" ng-href="dist/image/{{config.icon_default}}.png" rel="shortcut icon">
   </head>
 
   <body ng-cloak ng-controller="ApplicationController">
