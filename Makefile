@@ -2,6 +2,7 @@
 
 MODULE_NAME   = brew_view
 PYTHON_TEST_DIR = test/unit
+JS_DIR = brew_view/static
 
 .PHONY: clean clean-build clean-test clean-pyc help test
 .DEFAULT_GOAL := help
@@ -77,6 +78,7 @@ release: dist ## package and upload a release
 	twine upload dist/*
 
 dist: clean ## builds source and wheel package
+	$(MAKE) -C $(JS_DIR) dist
 	python setup.py sdist
 	python setup.py bdist_wheel
 	ls -l dist
