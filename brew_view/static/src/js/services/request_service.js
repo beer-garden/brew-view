@@ -11,7 +11,7 @@ requestService.$inject = ['$q', '$http', '$timeout'];
 export default function requestService($q, $http, $timeout) {
   let RequestService = {};
 
-  RequestService.complete_statuses = ['SUCCESS', 'ERROR', 'CANCELED'];
+  RequestService.completeStatuses = ['SUCCESS', 'ERROR', 'CANCELED'];
 
   RequestService.errorMap = {
     'empty': {
@@ -49,7 +49,7 @@ export default function requestService($q, $http, $timeout) {
     const checkForCompletion = function(id) {
       RequestService.getRequest(id).then(
         function(response) {
-          if (RequestService.complete_statuses.indexOf(response.data.status) == -1) {
+          if (RequestService.completeStatuses.indexOf(response.data.status) == -1) {
             // If request isn't done then we need to keep checking
             $timeout(function() {
               checkForCompletion(id);

@@ -20,7 +20,7 @@ export default function utilityService($rootScope, $http) {
       });
     } else {
       let newO = {};
-      for (origKey in o) {
+      for (const origKey in o) {
         if (o.hasOwnProperty(origKey)) {
           let value = o[origKey];
           let newKey = origKey.replace(/(\_\w)/g, function(m) {
@@ -39,10 +39,10 @@ export default function utilityService($rootScope, $http) {
 
   UtilityService.getIcon = function(iconName) {
     if (iconName === undefined || iconName == null) {
-      if ($rootScope.config === undefined || $rootScope.config.icon_default === undefined) {
+      if ($rootScope.config === undefined || $rootScope.config.iconDefault === undefined) {
         return '';
       } else {
-        iconName = $rootScope.config.icon_default;
+        iconName = $rootScope.config.iconDefault;
       }
     }
 
