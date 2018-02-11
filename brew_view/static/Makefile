@@ -42,7 +42,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -f yarn-error.log
 
 lint: ## check style with eslit
-	echo "TODO: run ESLint"
+	npm run lint
 
 test: ## run tests
 	echo "TODO: run javascript tests"
@@ -52,4 +52,3 @@ coverage: ## check code coverage
 
 dist: clean ## builds distribution
 	npm run build
-
