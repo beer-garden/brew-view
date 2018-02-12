@@ -86,7 +86,7 @@ export default function requestViewController(
         rawOutput = 'null';
       } else if ($scope.request.data.output_type == 'JSON') {
         try {
-          const parsedOutput = JSON.parse($scope.request.data.output);
+          let parsedOutput = JSON.parse($scope.request.data.output);
           rawOutput = $scope.stringify(parsedOutput);
 
           if ($scope.countNodes($scope.formattedOutput) < 1000) {
@@ -139,7 +139,7 @@ export default function requestViewController(
       SystemService.getSystemID(response.data).then(function(systemId) {
         // Using the system ID we can then get the system and instances
         SystemService.getSystem(systemId, false).then(function(systemObj) {
-          for (const i = 0; i < systemObj.data.instances.length; i++) {
+          for (let i = 0; i < systemObj.data.instances.length; i++) {
             if (systemObj.data.instances[i].name == response.data.instance_name) {
               // It's possible the instance comes back up before we get here so we don't want
               // to show it is running yet so in the html we need to put an ngif against
