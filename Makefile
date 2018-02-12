@@ -4,7 +4,7 @@ MODULE_NAME   = brew_view
 PYTHON_TEST_DIR = test/unit
 JS_DIR = brew_view/static
 
-.PHONY: clean clean-build clean-test clean-pyc help test
+.PHONY: clean clean-build clean-test clean-pyc help test deps
 .DEFAULT_GOAL := help
 define BROWSER_PYSCRIPT
 import os, webbrowser, sys
@@ -68,7 +68,7 @@ test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source $(MODULE_NAME) -m nose
+	coverage run --source $(MODULE_NAME) -m nose test/unit/
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
@@ -89,3 +89,7 @@ dist: clean ## builds source and wheel package
 
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
+
+deps:
+	pip install -r requirements.txt
+	$(MAKE) -C $(JS_DIR) deps
