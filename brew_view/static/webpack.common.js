@@ -31,6 +31,7 @@ module.exports = {
     }),
     new ExtractTextPlugin('[name].css'),
     new CopyWebpackPlugin([
+        {from: 'src/index.html'},
         {from: 'node_modules/swagger-ui-dist', to: 'swagger'},
         {from: 'src/image', to: 'image'},
     ]),
