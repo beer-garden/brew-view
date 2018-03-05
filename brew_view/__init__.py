@@ -153,10 +153,15 @@ def _setup_ssl_context(app_config):
         server_ssl = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         server_ssl.load_cert_chain(certfile=app_config.ssl_public_key,
                                    keyfile=app_config.ssl_private_key)
+        server_ssl.verify_mode = getattr(ssl, 'CERT_'+app_config.client_cert_verify.upper())
 
         client_ssl = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
         client_ssl.load_cert_chain(certfile=app_config.ssl_public_key,
                                    keyfile=app_config.ssl_private_key)
+
+        if app_config.ca_cert:
+            server_ssl.load_verify_locations(cafile=app_config.ca_cert)
+            client_ssl.load_verify_locations(cafile=app_config.ca_cert)
     else:
         server_ssl = None
         client_ssl = None
