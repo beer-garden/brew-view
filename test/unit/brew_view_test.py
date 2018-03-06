@@ -83,6 +83,12 @@ class BeerGardenTest(unittest.TestCase):
         bg._setup_ssl_context(config)
         context_mock.load_cert_chain.assert_called_with(certfile='/path/to/public.key',
                                                         keyfile='/path/to/private.key')
+    @patch('brew_view.ssl')
+    def test_setup_ssl_context_bad_client_verify_value(self, ssl_mock):
+        config = self.spec.load_config({'ssl_enabled': True,
+                                        'client_cert_verify': 'BAD'})
+
+        self.assertRaises(Exception, bg._setup_ssl_context, config)
 
     @patch('brew_view.PluginLoggingLoader')
     def test_load_plugin_logging_config(self, PluginLoggingLoaderMock):
