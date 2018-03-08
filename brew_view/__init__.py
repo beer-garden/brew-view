@@ -163,9 +163,9 @@ def _setup_ssl_context(app_config):
         client_ssl.load_cert_chain(certfile=app_config.ssl_public_key,
                                    keyfile=app_config.ssl_private_key)
 
-        if app_config.ca_cert:
-            server_ssl.load_verify_locations(cafile=app_config.ca_cert)
-            client_ssl.load_verify_locations(cafile=app_config.ca_cert)
+        if app_config.ca_cert or app_config.ca_path:
+            server_ssl.load_verify_locations(cafile=app_config.ca_cert, capath=app_config.ca_path)
+            client_ssl.load_verify_locations(cafile=app_config.ca_cert, capath=app_config.ca_path)
     else:
         server_ssl = None
         client_ssl = None

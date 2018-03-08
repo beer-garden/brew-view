@@ -91,7 +91,12 @@ SPECIFICATION = {
     },
     "ca_cert": {
         "type": "str",
-        "description": "Path to CA certificate file to use",
+        "description": "SSLContext cafile to use",
+        "required": False,
+    },
+    "ca_path": {
+        "type": "str",
+        "description": "SSLContext capath to use",
         "required": False,
     },
     "client_cert_verify": {
