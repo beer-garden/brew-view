@@ -420,7 +420,11 @@ export function sfBuilderService($rootScope, sfPath, UtilityService) {
         };
 
         if (parameter.choices.details && parameter.choices.details.key_reference) {
-          let field = parentKey + '.' + parameter.choices.details.key_reference;
+          let field = parameter.choices.details.key_reference;
+
+          if (field !== 'instance_name') {
+            field = parentKey + '.' + field;
+          }
 
           form['choices']['updateOn'] = field;
           form['choices']['transforms'] = [{lookupField: field}];
@@ -436,7 +440,11 @@ export function sfBuilderService($rootScope, sfPath, UtilityService) {
 
         for (let i=0; i<parameter.choices.details['args'].length; i++) {
           let pair = parameter.choices.details['args'][i];
-          let field = parentKey + '.' + pair[1];
+
+          let field = pair[1];
+          if (field !== 'instance_name') {
+            field = parentKey + '.' + field;
+          }
 
           form['choices']['updateOn'].push(field);
           form['choices']['httpGet']['queryParameterFields'][pair[0]] = field;
@@ -456,9 +464,15 @@ export function sfBuilderService($rootScope, sfPath, UtilityService) {
 
         for (let i=0; i<parameter.choices.details['args'].length; i++) {
           let pair = parameter.choices.details['args'][i];
-          let field = parentKey + '.' + pair[1];
 
-          form['choices']['updateOn'].push(field);
+          let field = pair[1];
+          if (field !== 'instance_name') {
+            field = parentKey + '.' + field;
+
+            // 'instance_name' is always in this list, don't want to duplicate it
+            form['choices']['updateOn'].push(field);
+          }
+
           form['choices']['callback']['argumentFields'].push(field);
           form['choices']['callback']['arguments'][0]['parameterNames'].push(pair[0]);
         }
