@@ -146,7 +146,7 @@ class RequestAPI(BaseHandler):
         self._update_job_numbers(req, status_before)
 
         if wait_condition:
-            wait_condition.notify()
+            wait_condition.set()
 
         self.request.event_extras = {'request': req, 'patch': operations}
 

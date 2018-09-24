@@ -24,6 +24,7 @@ from bg_utils.event_publisher import EventPublishers
 from bg_utils.pika import TransientPikaClient
 from bg_utils.plugin_logging_loader import PluginLoggingLoader
 from brew_view.authorization import anonymous_principal as load_anonymous
+from brew_view.pika import PikaClient
 from brew_view.publishers import (
     MongoPublisher, RequestPublisher, TornadoPikaPublisher, WebsocketPublisher)
 from brew_view.scheduler.jobstore import BGJobStore
@@ -57,6 +58,7 @@ request_map = {}
 anonymous_principal = None
 easy_client = None
 client_ssl = None
+clients = None
 
 
 def setup(spec, cli_args):
@@ -168,7 +170,7 @@ def load_plugin_logging_config(input_config):
 def _setup_application():
     """Setup things that can be taken care of before io loop is started"""
     global io_loop, tornado_app, public_url, thrift_context, easy_client
-    global server, client_ssl, request_scheduler, anonymous_principal
+    global server, client_ssl, request_scheduler, anonymous_principal, clients
 
     # Tweak some config options
     config.web.url_prefix = normalize_url_prefix(config.web.url_prefix)
@@ -197,6 +199,25 @@ def _setup_application():
         username=config.scheduler.auth.username,
         password=config.scheduler.auth.password,
     )
+
+    clients = {
+        'pika': PikaClient(
+            host=config.amq.host,
+            port=config.amq.connections.message.port,
+            ssl=config.amq.connections.message.ssl,
+            user=config.amq.connections.admin.user,
+            password=config.amq.connections.admin.password,
+            virtual_host=config.amq.virtual_host,
+            connection_attempts=config.amq.connection_attempts,
+            exchange=config.amq.exchange
+        ),
+        # 'pyrabbit': PyrabbitClient(host=bartender.config.amq.host,
+        #                            virtual_host=bartender.config.amq.virtual_host,
+        #                            **bartender.config.amq.connections.admin),
+        # 'public': PikaClient(host=bartender.config.publish_hostname,
+        #                      virtual_host=bartender.config.amq.virtual_host,
+        #                      **bartender.config.amq.connections.message),
+    }
 
     thrift_context = _setup_thrift_context()
     tornado_app = _setup_tornado_app()

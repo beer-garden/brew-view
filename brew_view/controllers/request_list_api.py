@@ -1,21 +1,14 @@
 import json
 import logging
-from datetime import timedelta
 from functools import reduce
 
 from mongoengine import Q
-from tornado.gen import coroutine
-from tornado.locks import Condition
 
-import bg_utils
-import brew_view
 from bg_utils.models import Request, System
 from bg_utils.parser import BeerGardenSchemaParser
-from brew_view import thrift_context
 from brew_view.authorization import authenticated, Permissions
 from brew_view.base_handler import BaseHandler
-from brewtils.errors import (ModelValidationError, RequestPublishException,
-                             TimeoutExceededError)
+from brew_view.request_processor import create_request
 from brewtils.models import Events
 
 
@@ -198,9 +191,8 @@ class RequestListAPI(BaseHandler):
         self.write(self.parser.serialize_request(requests, to_string=True, many=True,
                                                  only=requested_fields))
 
-    @coroutine
-    @authenticated(permissions=[Permissions.REQUEST_CREATE])
-    def post(self):
+    # @authenticated(permissions=[Permissions.REQUEST_READ])
+    async def post(self):
         """
         ---
         summary: Create a new Request
@@ -243,9 +235,8 @@ class RequestListAPI(BaseHandler):
         """
         self.request.event.name = Events.REQUEST_CREATED.name
 
-        if self.request.mime_type == 'application/json':
-            request_model = self.parser.parse_request(self.request.decoded_body, from_string=True)
-        elif self.request.mime_type == 'application/x-www-form-urlencoded':
+        # Only form-data and json make it past the base_handler
+        if self.request.mime_type == 'application/x-www-form-urlencoded':
             args = {'parameters': {}}
             for key, value in self.request.body_arguments.items():
                 if key.startswith('parameters.'):
@@ -255,7 +246,10 @@ class RequestListAPI(BaseHandler):
                     args[key] = value[0].decode(self.request.charset)
             request_model = Request(**args)
         else:
-            raise ModelValidationError('Unsupported or missing content-type header')
+            request_model = self.parser.parse_request(
+                self.request.decoded_body,
+                from_string=True
+            )
 
         if request_model.parent:
             request_model.parent = Request.objects.get(id=str(request_model.parent.id))
@@ -266,62 +260,26 @@ class RequestListAPI(BaseHandler):
         if self.current_user:
             request_model.requester = self.current_user.username
 
-        with thrift_context() as client:
-            try:
-                request_model.save()
-                yield client.processRequest(str(request_model.id))
-
-            except bg_utils.bg_thrift.InvalidRequest as ex:
-                request_model.delete()
-                raise ModelValidationError(ex.message)
-            except bg_utils.bg_thrift.PublishException as ex:
-                request_model.delete()
-                raise RequestPublishException(ex.message)
-            except Exception:
-                if request_model.id:
-                    request_model.delete()
-                raise
-            else:
-                if self.get_argument('blocking', default='').lower() == 'true':
-                    timeout = self.get_argument('timeout', default=None)
-                    if timeout is None:
-                        timeout_delta = None
-                    else:
-                        timeout_delta = timedelta(seconds=int(timeout))
-
-                    condition = Condition()
-                    brew_view.request_map[str(request_model.id)] = condition
-
-                    wait_result = yield condition.wait(timeout_delta)
-                    if not wait_result:
-                        raise TimeoutExceededError()
-
-        request_model.reload()
-
-        # Query for request from body id
-        req = Request.objects.get(id=str(request_model.id))
-
-        # Now attempt to add the instance status as a header.
-        # The Request is already created at this point so it's a best-effort thing
-        self.set_header("Instance-Status", 'UNKNOWN')
+        request = await create_request(
+            request_model,
+            wait=self.get_argument('blocking', default='').lower() == 'true',
+            timeout=self.get_argument('timeout', default=None)
+        )
 
         try:
-            # Since request has system info we can query for a system object
-            system = System.objects.get(name=req.system, version=req.system_version)
+            system = System.objects.get(
+                name=request.system, version=request.system_version)
 
-            # Loop through all instances in the system until we find the instance that matches
-            # the request instance
             for instance in system.instances:
-                if instance.name == req.instance_name:
+                if instance.name == request.instance_name:
                     self.set_header("Instance-Status", instance.status)
+                    break
+        except Exception:
+            self.set_header("Instance-Status", 'UNKNOWN')
+            self.logger.warning('Unable to get Instance status for Request %s' %
+                                str(request_model.id))
 
-        # The Request is already created at this point so adding the Instance status header is a
-        # best-effort thing
-        except Exception as ex:
-            self.logger.exception('Unable to get Instance status for Request %s: %s',
-                                  str(request_model.id), ex)
-
-        self.request.event_extras = {'request': req}
+        self.request.event_extras = {'request': request}
 
         self.set_status(201)
         self.queued_request_gauge.labels(
@@ -335,6 +293,7 @@ class RequestListAPI(BaseHandler):
             instance_name=request_model.instance_name,
             command=request_model.command,
         ).inc()
+
         self.write(self.parser.serialize_request(request_model, to_string=False))
 
     def _get_requests(self, start, end):

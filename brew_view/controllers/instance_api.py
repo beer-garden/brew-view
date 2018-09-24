@@ -1,11 +1,9 @@
 import logging
 from datetime import datetime
 
-from tornado.gen import coroutine
-
+import brew_view.instance_manager as manager
 from bg_utils.models import Instance
 from bg_utils.parser import BeerGardenSchemaParser
-from brew_view import thrift_context
 from brew_view.authorization import authenticated, Permissions
 from brew_view.base_handler import BaseHandler
 from brewtils.errors import ModelValidationError
@@ -48,8 +46,9 @@ class InstanceAPI(BaseHandler):
         """
         self.logger.debug("Getting Instance: %s", instance_id)
 
-        self.write(self.parser.serialize_instance(Instance.objects.get(id=instance_id),
-                                                  to_string=False))
+        self.write(self.parser.serialize_instance(
+            Instance.objects.get(id=instance_id),
+            to_string=False))
 
     @authenticated(permissions=[Permissions.INSTANCE_DELETE])
     def delete(self, instance_id):
@@ -78,9 +77,9 @@ class InstanceAPI(BaseHandler):
 
         self.set_status(204)
 
-    @coroutine
-    @authenticated(permissions=[Permissions.INSTANCE_UPDATE])
-    def patch(self, instance_id):
+    # @coroutine
+    # @authenticated(permissions=[Permissions.INSTANCE_UPDATE])
+    async def patch(self, instance_id):
         """
         ---
         summary: Partially update an Instance
@@ -128,13 +127,16 @@ class InstanceAPI(BaseHandler):
         """
         response = {}
         instance = Instance.objects.get(id=instance_id)
-        operations = self.parser.parse_patch(self.request.decoded_body, many=True, from_string=True)
+        operations = self.parser.parse_patch(
+            self.request.decoded_body, many=True, from_string=True)
 
         for op in operations:
-            if op.operation.lower() in ('initialize', 'start', 'stop'):
-                self.request.event.name = self.event_dict[op.operation.lower()]
-                with thrift_context() as client:
-                    response = yield getattr(client, op.operation.lower()+'Instance')(instance_id)
+            op.operation = op.operation.lower()
+
+            if op.operation in ('initialize', 'start', 'stop'):
+                self.request.event.name = self.event_dict[op.operation]
+
+                response = await getattr(manager, op.operation)(instance)
 
             elif op.operation.lower() == 'heartbeat':
                 instance.status_info.heartbeat = datetime.utcnow()
@@ -143,26 +145,10 @@ class InstanceAPI(BaseHandler):
 
             elif op.operation.lower() == 'replace':
                 if op.path.lower() == '/status':
-                    if op.value.upper() == 'INITIALIZING':
-                        self.request.event.name = Events.INSTANCE_INITIALIZED.name
-                        with thrift_context() as client:
-                            response = yield client.initializeInstance(instance_id)
-
-                    elif op.value.upper() == 'STOPPING':
-                        self.request.event.name = Events.INSTANCE_STOPPED.name
-                        with thrift_context() as client:
-                            response = yield client.stopInstance(instance_id)
-
-                    elif op.value.upper() == 'STARTING':
-                        self.request.event.name = Events.INSTANCE_STARTED.name
-                        with thrift_context() as client:
-                            response = yield client.startInstance(instance_id)
-
-                    elif op.value.upper() in ['RUNNING', 'STOPPED']:
+                    if op.value.upper() in ['RUNNING', 'STOPPED']:
                         instance.status = op.value.upper()
                         instance.save()
                         response = self.parser.serialize_instance(instance, to_string=False)
-
                     else:
                         error_msg = "Unsupported status value '%s'" % op.value
                         self.logger.warning(error_msg)
