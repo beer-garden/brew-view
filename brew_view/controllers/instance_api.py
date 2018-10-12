@@ -145,7 +145,7 @@ class InstanceAPI(BaseHandler):
 
             elif op.operation.lower() == 'replace':
                 if op.path.lower() == '/status':
-                    if op.value.upper() in ['RUNNING', 'STOPPED']:
+                    if op.value.upper() in Instance.INSTANCE_STATUSES:
                         instance.status = op.value.upper()
                         instance.save()
                         response = self.parser.serialize_instance(instance, to_string=False)
