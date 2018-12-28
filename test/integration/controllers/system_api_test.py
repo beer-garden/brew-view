@@ -6,11 +6,11 @@ from mock import MagicMock, Mock, patch
 import brew_view
 from bg_utils.mongo.models import Command, Instance, System
 from bg_utils.mongo.parser import MongoParser
-from ...utils import TestUtils
+from brewtils.test.comparable import assert_system_equal
 
 
 @unittest.skip("TODO")
-class SystemAPITest(TestUtils, unittest.TestCase):
+class SystemAPITest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # brew_view.load_app(environment="test")
@@ -46,7 +46,7 @@ class SystemAPITest(TestUtils, unittest.TestCase):
         self.assertEqual(200, response.status_code)
 
         response_system = self.parser.parse_system(response.data, from_string=True)
-        self._assert_systems_equal(self.default_system, response_system)
+        assert_system_equal(self.default_system, response_system)
 
     @patch("mongoengine.queryset.QuerySet.get")
     def test_get_system_no_include_commands(self, mock_get):
@@ -58,7 +58,7 @@ class SystemAPITest(TestUtils, unittest.TestCase):
         self.assertEqual(200, response.status_code)
 
         response_system = self.parser.parse_system(response.data, from_string=True)
-        self._assert_systems_equal(
+        assert_system_equal(
             self.default_system, response_system, include_commands=False
         )
         self.assertFalse(response_system.commands)
@@ -97,7 +97,7 @@ class SystemAPITest(TestUtils, unittest.TestCase):
         save_mock.assert_called_once_with()
 
         response_system = self.parser.parse_system(response.data, from_string=True)
-        self._assert_systems_equal(self.default_system, response_system)
+        assert_system_equal(self.default_system, response_system)
 
     @patch(
         "mongoengine.queryset.QuerySet.get", Mock(side_effect=mongoengine.DoesNotExist)

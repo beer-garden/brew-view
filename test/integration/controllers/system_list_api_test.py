@@ -6,11 +6,10 @@ from mock import Mock, patch
 import brew_view
 from bg_utils.mongo.models import Command, Instance, System
 from bg_utils.mongo.parser import MongoParser
-from ...utils import TestUtils
 
 
 @unittest.skip("TODO")
-class SystemListAPITest(TestUtils, unittest.TestCase):
+class SystemListAPITest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # brew_view.load_app(environment="test")
@@ -84,8 +83,6 @@ class SystemListAPITest(TestUtils, unittest.TestCase):
     @patch("bg_utils.parser.BeerGardenParser.parse_system_dict")
     @patch("brew_view.controllers.system_list_api.url_for")
     def test_post_check_calls(self, url_for_mock, parse_mock):
-        import flask
-
         fake_system = Mock(id="id")
         url_for_mock.return_value = "url"
         jsonify_mock = Mock(wraps=flask.jsonify)

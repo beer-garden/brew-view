@@ -58,6 +58,12 @@ def thrift_context(thrift_client):
 
 
 @pytest.fixture
+def bad_id():
+    """A bad mongo ID"""
+    return "".join(["1" for _ in range(24)])
+
+
+@pytest.fixture
 def mongo_system(bg_system):
     return brew2mongo(bg_system)
 
