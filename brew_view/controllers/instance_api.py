@@ -150,22 +150,7 @@ class InstanceAPI(BaseHandler):
 
             elif op.operation.lower() == "replace":
                 if op.path.lower() == "/status":
-                    if op.value.upper() == "INITIALIZING":
-                        self.request.event.name = Events.INSTANCE_INITIALIZED.name
-                        with thrift_context() as client:
-                            response = yield client.initializeInstance(instance_id)
-
-                    elif op.value.upper() == "STOPPING":
-                        self.request.event.name = Events.INSTANCE_STOPPED.name
-                        with thrift_context() as client:
-                            response = yield client.stopInstance(instance_id)
-
-                    elif op.value.upper() == "STARTING":
-                        self.request.event.name = Events.INSTANCE_STARTED.name
-                        with thrift_context() as client:
-                            response = yield client.startInstance(instance_id)
-
-                    elif op.value.upper() in ["RUNNING", "STOPPED"]:
+                    if op.value.upper() in Instance.INSTANCE_STATUSES:
                         instance.status = op.value.upper()
                         instance.save()
                         response = self.parser.serialize_instance(
