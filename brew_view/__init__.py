@@ -244,6 +244,9 @@ def _setup_scheduler():
 def _setup_tornado_app():
 
     # Import these here so we don't have a problem importing thrift_context
+    import brew_view.handlers.v2.event
+    import brew_view.handlers.v2.instance
+    import brew_view.handlers.v2.system
     from brew_view.controllers import (
         AdminAPI,
         CommandAPI,
@@ -274,6 +277,7 @@ def _setup_tornado_app():
         JobAPI,
         JobListAPI,
         PermissionsAPI,
+        NamespaceAPI,
     )
 
     prefix = config.web.url_prefix
@@ -303,10 +307,22 @@ def _setup_tornado_app():
         (r"{0}api/v1/config/logging/?".format(prefix), LoggingConfigAPI),
         # Beta
         (r"{0}api/vbeta/events/?".format(prefix), EventPublisherAPI),
+        (r"{0}api/vbeta/namespaces/?".format(prefix), NamespaceAPI),
         # Deprecated
         (r"{0}api/v1/admin/system/?".format(prefix), OldAdminAPI),
         (r"{0}api/v1/admin/queues/?".format(prefix), OldQueueListAPI),
         (r"{0}api/v1/admin/queues/([\w\.-]+)/?".format(prefix), OldQueueAPI),
+
+        # V2
+        (r"{0}api/v2/users/?".format(prefix), UsersAPI),
+        (r"{0}api/v2/users/(\w+)/?".format(prefix), UserAPI),
+        (r"{0}api/v2/tokens/?".format(prefix), TokenListAPI),
+        (r"{0}api/v2/tokens/(\w+)/?".format(prefix), TokenAPI),
+
+        (r"{0}api/v2/namespaces/(\w+)/events/?".format(prefix), brew_view.handlers.v2.event.EventPublisherAPI),
+        (r"{0}api/v2/namespaces/(\w+)/instances/(\w+)/?".format(prefix), brew_view.handlers.v2.instance.InstanceAPI),
+        (r"{0}api/v2/namespaces/(\w+)/systems/?".format(prefix), brew_view.handlers.v2.system.SystemListAPI),
+        (r"{0}api/v2/namespaces/(\w+)/systems/(\w+)/?".format(prefix), brew_view.handlers.v2.system.SystemAPI),
     ]
 
     # And these do not

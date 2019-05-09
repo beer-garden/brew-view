@@ -2,26 +2,29 @@
 landingController.$inject = [
   '$scope',
   '$rootScope',
-  '$location',
-  '$interval',
+  // '$location',
+  // '$interval',
+  '$state',
   'SystemService',
   'UtilityService',
 ];
 
 /**
  * landingController - Controller for the landing page.
- * @param  {$scope} $scope         Angular's $scope object.
- * @param  {$rootScope} $rootScope Angular's $rootScope object.
- * @param  {$location} $location   Angular's $location object.
- * @param  {$interval} $interval   Angular's $interval object.
+ * @param  {Object} $scope         Angular's $scope object.
+ * @param  {Object} $rootScope     Angular's $rootScope object.
+ * @param  {Object} $location      Angular's $location object.
+ * @param  {Object} $interval      Angular's $interval object.
+ * @param  {Object} $state         Angular's $state object.
  * @param  {Object} SystemService  Beer-Garden's sytem service.
  * @param  {Object} UtilityService Beer-Garden's utility service.
  */
 export default function landingController(
     $scope,
     $rootScope,
-    $location,
-    $interval,
+    // $location,
+    // $interval,
+    $state,
     SystemService,
     UtilityService) {
   $scope.setWindowTitle();
@@ -39,20 +42,28 @@ export default function landingController(
   };
 
   $scope.exploreSystem = function(system) {
-    $location.path($rootScope.getSystemUrl(system.id));
+    $state.go('namespace.system',
+      {
+        'name': system.name,
+        'version': system.version,
+      }
+    );
   };
 
   function loadSystems() {
     $scope.response = undefined;
     $scope.data = {};
 
-    SystemService.getSystems(false).then(
+    SystemService.getSystems($scope.currentNamespace(), false).then(
       $scope.successCallback,
       $scope.failureCallback
     );
   }
 
   $scope.$on('userChange', () => {
+    loadSystems();
+  });
+  $scope.$on('namespaceChange', () => {
     loadSystems();
   });
 

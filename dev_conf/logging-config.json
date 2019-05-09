@@ -18,13 +18,13 @@
             "level": "ERROR"
         },
         "tornado.access": {
-            "level": "WARN"
+            "level": "INFO"
         }, 
         "tornado.application": {
-            "level": "WARN"
+            "level": "INFO"
         }, 
         "tornado.general": {
-            "level": "WARN"
+            "level": "INFO"
         }
     }, 
     "root": {

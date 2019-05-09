@@ -1,21 +1,33 @@
 
-routeConfig.$inject = ['$stateProvider', '$urlRouterProvider'];
+routeConfig.$inject = ['$stateProvider', '$urlRouterProvider', '$locationProvider'];
 
 /**
  * routeConfig - routing config for the application.
  * @param  {type} $stateProvider     Angular's $stateProvider object.
  * @param  {type} $urlRouterProvider Angular's $urlRouterProvider object.
+ * @param  {type} $locationProvider  Angular's $locationProvider object.
  */
-export default function routeConfig($stateProvider, $urlRouterProvider) {
+export default function routeConfig($stateProvider, $urlRouterProvider, $locationProvider) {
   const basePath = 'partials/';
 
-  $urlRouterProvider.otherwise('/');
+  $urlRouterProvider.otherwise('/default/');
+
+  // // use the HTML5 History API
+  // $locationProvider.html5Mode(true);
 
   $stateProvider
-    .state('landing', {
-        url: '/',
-        templateUrl: basePath + 'landing.html',
-        controller: 'LandingController',
+    .state('namespace', {
+      url: '/:namespace',
+      params: {
+        namespace: {
+          value: 'default',
+        },
+      },
+    })
+    .state('namespace.landing', {
+      url: '/',
+      templateUrl: basePath + 'landing.html',
+      controller: 'LandingController',
     })
     .state('login', {
       url: '/login',
@@ -23,28 +35,28 @@ export default function routeConfig($stateProvider, $urlRouterProvider) {
       controller: 'LoginController',
     })
     // Unused by our UI, but helpful for external links.
-    .state('systemID', {
+    .state('namespace.systemID', {
       url: '/systems/:id',
       templateUrl: basePath + 'system_view.html',
       controller: 'SystemViewController',
     })
-    .state('system', {
+    .state('namespace.system', {
       'url': '/systems/:name/:version',
       'templateUrl': basePath + 'system_view.html',
       'controller': 'SystemViewController',
     })
     .state('about', {
-      url: '/about',
+      url: '/:namespace/about',
       templateUrl: basePath + 'about.html',
       controller: 'AboutController',
     })
     .state('jobs', {
-      url: '/jobs',
+      url: '/:namespace/jobs',
       templateUrl: basePath + 'job_index.html',
       controller: 'JobIndexController',
     })
     .state('jobsCreate', {
-      url: '/jobs/create',
+      url: '/:namespace/jobs/create',
       templateUrl: basePath + 'job_create.html',
       controller: 'JobCreateController',
       params: {
@@ -54,17 +66,17 @@ export default function routeConfig($stateProvider, $urlRouterProvider) {
       },
     })
     .state('job', {
-      'url': '/jobs/:id',
+      'url': '/:namespace/jobs/:id',
       'templateUrl': basePath + 'job_view.html',
       'controller': 'JobViewController',
     })
     .state('commands', {
-      url: '/commands',
+      url: '/:namespace/commands',
       templateUrl: basePath + 'command_index.html',
       controller: 'CommandIndexController',
     })
     .state('command', {
-      url: '/systems/:systemName/:systemVersion/commands/:name',
+      url: '/:namespace/systems/:systemName/:systemVersion/commands/:name',
       templateUrl: basePath + 'command_view.html',
       controller: 'CommandViewController',
       params: {
@@ -74,30 +86,30 @@ export default function routeConfig($stateProvider, $urlRouterProvider) {
     })
     // Unused by our UI, but helpful for external links.
     .state('commandID', {
-      url: '/commands/:id',
+      url: '/:namespace/commands/:id',
       templateUrl: basePath + 'command_view.html',
       controller: 'CommandViewController',
       params: {
         request: null,
       },
     })
-    .state('requests', {
+    .state('namespace.requests', {
       url: '/requests',
       templateUrl: basePath + 'request_index.html',
       controller: 'RequestIndexController',
     })
-    .state('request', {
+    .state('namespace.request', {
       url: '/requests/:request_id',
       templateUrl: basePath + 'request_view.html',
       controller: 'RequestViewController',
     })
     .state('queues', {
-      url: '/admin/queues',
+      url: '/:namespace/admin/queues',
       templateUrl: basePath + 'admin_queue.html',
       controller: 'AdminQueueController',
     })
     .state('system_admin', {
-      url: '/admin/systems',
+      url: '/:namespace/admin/systems',
       templateUrl: basePath + 'admin_system.html',
       controller: 'AdminSystemController',
     })

@@ -92,8 +92,8 @@ export default function commandIndexController(
         // We don't actually use the CommandService.getCommands(), but make the
         // call just to verify that the user has bg-command-read
         $q.all({
-          commands: CommandService.getCommands(),
-          systems: SystemService.getSystems(),
+          commands: CommandService.getCommands($scope.currentNamespace()),
+          systems: SystemService.getSystems($scope.currentNamespace()),
         }).then(
           $scope.successCallback,
           $scope.failureCallback

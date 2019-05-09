@@ -312,7 +312,7 @@ export default function commandViewController(
   const findAndLoadSystem = function(systemName, systemVersion) {
     return $rootScope.findSystem(systemName, systemVersion).then(
       (bareSystem) => {
-        return SystemService.getSystem(bareSystem.id, true);
+        return SystemService.getSystem($scope.currentNamespace(), bareSystem.id, true);
       }
     );
   };
@@ -337,7 +337,8 @@ export default function commandViewController(
         if (stateParams.id) {
           CommandService.getCommand(stateParams.id).then(
             (cmdResponse) => {
-              SystemService.getSystem(cmdResponse.data.system.id).then(
+              SystemService.getSystem($scope.currentNamespace(),
+                  cmdResponse.data.system.id).then(
                 (sysResponse) => {
                   $scope.system = sysResponse.data;
                   $scope.successCallback(cmdResponse);

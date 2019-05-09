@@ -278,7 +278,7 @@ export default function jobCreateController(
       // This is kinda gross but easy - just fake we got this from backend
       $scope.response = {status: 200, data: stateParams.request};
     } else {
-      SystemService.getSystems().then(
+      SystemService.getSystems($scope.currentNamespace()).then(
         $scope.successCallback,
         $scope.failureCallback
       );

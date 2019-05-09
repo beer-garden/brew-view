@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title ng-bind="title"></title>
+    <base href="/">
 
     <link href="vendor.css" rel="stylesheet">
     <link href="index.css" rel="stylesheet">
@@ -34,6 +35,24 @@
           <i ng-class="getIcon(config.iconDefault)"></i>
           <span ng-cloak>{{config.applicationName}}</span>
         </a>
+
+        <ul class="nav navbar-nav navbar-top-links navbar-left">
+          <li class="dropdown">
+            <a href="" class="dropdown-toggle" data-toggle="dropdown">
+              <span>{{currentNamespace()}}</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li ng-repeat="(namespace, enabled) in namespaces">
+                <div style="padding: 3px 15px; cursor: pointer;"
+                      ng-click="changeNamespace(namespace)">
+                  <span class="fa" ng-class="{'fa-check': enabled, 'fa-fw': !enabled}"></span>
+                  <span>{{namespace}}</span>
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
       </div>
 
       <ul class="nav navbar-nav navbar-top-links navbar-right">

@@ -58,7 +58,8 @@ export default function appRun(
   $rootScope.apiBaseUrl = '';
 
   $rootScope.config = {};
-  $rootScope.systems = [];
+  $rootScope.systems = []
+  $rootScope.namespaces = {};
 
   $rootScope.themes = {
     'default': false,
@@ -71,6 +72,11 @@ export default function appRun(
     $rootScope.configPromise = UtilityService.getConfig().then(
       (response) => {
         angular.extend($rootScope.config, camelCaseKeys(response.data));
+
+        $rootScope.namespaces[$rootScope.config.namespaces.local] = true;
+        for (let namespace of $rootScope.config.namespaces.remote) {
+          $rootScope.namespaces[namespace] = false;
+        }
       },
       (response) => {
         return $q.reject(response);
@@ -102,7 +108,7 @@ export default function appRun(
 
   $rootScope.loadSystems = function() {
     $rootScope.systemsPromise = SystemService.getSystems(
-        false, 'id,name,version').then(
+        $rootScope.currentNamespace(), false, 'id,name,version').then(
       (response) => {
         $rootScope.systems = response.data;
       },
@@ -140,14 +146,17 @@ export default function appRun(
       TokenService.handleToken(token);
     }
 
-    $rootScope.loadConfig();
-    $rootScope.loadSystems();
-    $rootScope.loadUser(token).catch(
-      // This prevents the situation where the user needs to logout but the
-      // logout button isn't displayed because there's no user loaded
-      // (happens if the server secret changes)
-      (response) => {
-        $rootScope.doLogout();
+    $rootScope.loadConfig().then(
+      () => {
+        $rootScope.loadSystems();
+        $rootScope.loadUser(token).catch(
+          // This prevents the situation where the user needs to logout but the
+          // logout button isn't displayed because there's no user loaded
+          // (happens if the server secret changes)
+          (response) => {
+            $rootScope.doLogout();
+          }
+        );
       }
     );
 
@@ -174,6 +183,22 @@ export default function appRun(
     if ($rootScope.isUser($rootScope.user) && sendUpdate) {
       UserService.setTheme($rootScope.user.id, theme);
     }
+  };
+
+  $rootScope.changeNamespace = function(namespace) {
+    // localStorageService.set('currentTheme', theme);
+    for (const key of Object.keys($rootScope.namespaces)) {
+      $rootScope.namespaces[key] = (key == namespace);
+    };
+    $rootScope.$broadcast('namespaceChange');
+  };
+
+  $rootScope.currentNamespace = function() {
+    for (const key of Object.keys($rootScope.namespaces)) {
+      if ($rootScope.namespaces[key] === true) {
+        return key;
+      }
+    };
   };
 
   $rootScope.isUser = function(user) {
@@ -351,6 +376,12 @@ export default function appRun(
       }
     }
   };
+
+  $rootScope.$on("$routeChangeStart", function(event, next, current) {
+    console.log(event);
+    console.log(next);
+    console.log(current);
+  });
 
   $rootScope.initialLoad();
 };

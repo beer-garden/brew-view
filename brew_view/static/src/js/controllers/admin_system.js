@@ -55,11 +55,17 @@ export default function adminSystemController(
   };
 
   $scope.reloadSystem = function(system) {
-    SystemService.reloadSystem(system).then(_.noop, $scope.addErrorAlert);
+    SystemService.reloadSystem($scope.currentNamespace(), system).then(
+      _.noop,
+      $scope.addErrorAlert
+    );
   };
 
   $scope.deleteSystem = function(system) {
-    SystemService.deleteSystem(system).then(_.noop, $scope.addErrorAlert);
+    SystemService.deleteSystem($scope.currentNamespace(), system).then(
+      _.noop,
+      $scope.addErrorAlert
+    );
   };
 
   $scope.hasRunningInstances = function(system) {
@@ -154,7 +160,7 @@ export default function adminSystemController(
   }
 
   let loadSystems = function() {
-    SystemService.getSystems(true,
+    SystemService.getSystems($scope.currentNamespace(), true,
         'id,name,display_name,version,instances').then(
       $scope.successCallback,
       $scope.failureCallback

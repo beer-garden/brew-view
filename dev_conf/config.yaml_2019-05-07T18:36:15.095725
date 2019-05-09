@@ -41,7 +41,7 @@ db:
     port: 27017
     username: null
   name: beer_garden
-debug_mode: false
+debug_mode: true
 event:
   amq:
     enable: false
@@ -58,9 +58,6 @@ metrics:
   url: http://localhost:3000
 namespaces:
   local: default
-  remote:
-    - foo
-    - bar
 plugin_logging:
   config_file: null
   level: INFO
