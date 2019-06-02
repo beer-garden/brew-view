@@ -249,6 +249,8 @@ def _setup_tornado_app():
         CommandAPI,
         CommandListAPI,
         ConfigHandler,
+        FileListAPI,
+        FileAPI,
         InstanceAPI,
         QueueAPI,
         QueueListAPI,
@@ -303,6 +305,8 @@ def _setup_tornado_app():
         (r"{0}api/v1/config/logging/?".format(prefix), LoggingConfigAPI),
         # Beta
         (r"{0}api/vbeta/events/?".format(prefix), EventPublisherAPI),
+        (r"{0}api/vbeta/files/?".format(prefix), FileListAPI),
+        (r"{0}api/vbeta/files/(\w+)/?".format(prefix), FileAPI),
         # Deprecated
         (r"{0}api/v1/admin/system/?".format(prefix), OldAdminAPI),
         (r"{0}api/v1/admin/queues/?".format(prefix), OldQueueListAPI),
