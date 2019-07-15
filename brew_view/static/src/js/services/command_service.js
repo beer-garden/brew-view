@@ -10,10 +10,10 @@ commandService.$inject = ['$http', '$rootScope'];
 export default function commandService($http, $rootScope) {
   return {
     getCommands: () => {
-      return $http.get('api/v1/commands');
+      return $http.get('api/v2/namespaces/{namespace}/commands');
     },
     getCommand: (id) => {
-      return $http.get('api/v1/commands/' + id);
+      return $http.get('api/v2/namespaces/{namespace}/commands/' + id);
     },
     findSystem: (command) => {
       return $rootScope.findSystemByID(command.system.id);

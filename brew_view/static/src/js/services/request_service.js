@@ -15,14 +15,14 @@ export default function requestService($q, $http, $timeout) {
   let service = {
     getRequests: (data) => {
       return $http.get(
-        'api/v1/requests', {params: data}
+        'api/v2/namespaces/{namespace}/requests', {params: data}
       );
     },
     getRequest: (id) => {
-      return $http.get('api/v1/requests/' + id);
+      return $http.get('api/v2/namespaces/{namespace}/requests/' + id);
     },
     createRequest: (request) => {
-      return $http.post('api/v1/requests', request);
+      return $http.post('api/v2/namespaces/{namespace}/requests', request);
     },
     isComplete: (request) => {
       return _.includes(completeStatuses, request.status);

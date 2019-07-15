@@ -17,6 +17,9 @@ export function interceptorService($rootScope, $templateCache) {
 
     config.headers['bg-namespace'] = $rootScope.getCurrentNamespace();
 
+    // Do some mangling for namespace support
+    config.url = config.url.replace("{namespace}", $rootScope.getCurrentNamespace());
+
     return config;
   };
 };
