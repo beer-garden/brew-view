@@ -224,5 +224,18 @@ export default function appRun(
     $state.go('base.landing');
   });
 
+  $transitions.onSuccess({}, (transition) => {
+    console.log(`Good Transition from  ${transition.from().name} to ${transition.to().name}`);
+  });
+
+  $transitions.onError({}, (transition) => {
+    console.log(`Bad Transition from  ${transition.from().name} to ${transition.to().name}`);
+    console.log(transition.error());
+  });
+
   $rootScope.initialLoad();
+
+  EventService.addCallback('console', (event) => {
+    console.log('Websocket message: ' + JSON.stringify(event));
+  });
 };
