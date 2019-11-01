@@ -157,7 +157,7 @@ export function adminRoleController(
     let original = _.find($scope.serverRoles, {'id': changed.id});
 
     // Since this is a result of a click, we need to update primary roles
-    changed.primaryRoles[roleName] = !changed.roles[roleName];
+    changed.primaryRoles[roleName] = changed.roles[roleName];
 
     // Ok, so if a role is changing that means that the 'primary' permissions
     // have not changed. So recalculate the coalesced permissions (the
@@ -211,9 +211,11 @@ export function adminRoleController(
     let original = _.find($scope.serverRoles, {'id': changed.id});
 
     // Since this is a result of a click, we need to update primary permissions
-    changed.primaryPermissions[permission] = !changed.permission[permission];
+    changed.primaryPermissions[permission] = changed.permission[permission];
 
-    changed.permissionsChanged = true;
+    if (changed.permissions[permission] != original.permissions[permission]){
+        changed.permissionsChanged = true;
+    }
   };
 
   /**

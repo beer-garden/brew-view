@@ -136,7 +136,7 @@ export function adminUserController(
     let changed = $scope.selectedUser;
 
     // Since this is a result of a click, we need to update primary roles
-    changed.primaryRoles[roleName] = !changed.roles[roleName];
+    changed.primaryRoles[roleName] = changed.roles[roleName];
 
     // Then get the list of roles that are checked
     let primaryRoleNames = mapToArray(changed.primaryRoles);
