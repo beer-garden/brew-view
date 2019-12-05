@@ -163,10 +163,15 @@ SPECIFICATION = {
                 "previous_names": ["icon_default"],
                 "alt_env_names": ["ICON_DEFAULT"],
             },
+            "allow_unsafe_output": {
+                "type": "bool",
+                "default": False,
+                "description": "Allow unsafe output HTML to be displayed in the UI",
+            },
             "allow_unsafe_templates": {
                 "type": "bool",
                 "default": False,
-                "description": "Allow unsafe templates to be loaded by the application",
+                "description": "Allow unsafe templates to be used in the UI",
                 "previous_names": [
                     "ALLOW_UNSANITIZED_TEMPLATES",
                     "allow_unsafe_templates",

@@ -19,6 +19,7 @@ amq:
   host: localhost
   virtual_host: /
 application:
+  allow_unsafe_output: false
   allow_unsafe_templates: false
   icon_default: fa-beer
   name: Beer Garden

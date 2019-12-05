@@ -11,6 +11,7 @@ class ConfigHandler(BaseHandler):
     def get(self):
         """Subset of configuration options that the frontend needs"""
         configs = {
+            "allow_unsafe_output": brew_view.config.application.allow_unsafe_output,
             "allow_unsafe_templates": brew_view.config.application.allow_unsafe_templates,
             "application_name": brew_view.config.application.name,
             "amq_admin_port": brew_view.config.amq.connections.admin.port,

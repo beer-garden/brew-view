@@ -7,6 +7,7 @@ requestViewController.$inject = [
   '$stateParams',
   '$timeout',
   '$animate',
+  '$sce',
   'RequestService',
   'SystemService',
 ];
@@ -18,6 +19,7 @@ requestViewController.$inject = [
  * @param  {$stateParams} $stateParams Angular's $stateParams object.
  * @param  {$timeout} $timeout         Angular's $timeout object.
  * @param  {$animate} $animate         Angular's $animate object.
+ * @param  {$sce} $sce                 Angular's $sce object.
  * @param  {Object} RequestService     Beer-Garden Request Service.
  * @param  {Object} SystemService      Beer-Garden's System Service.
  */
@@ -27,6 +29,7 @@ export default function requestViewController(
     $stateParams,
     $timeout,
     $animate,
+    $sce,
     RequestService,
     SystemService) {
   $scope.service = RequestService;
@@ -89,7 +92,11 @@ export default function requestViewController(
       if (rawOutput === undefined || rawOutput == null) {
         rawOutput = 'null';
       } else if ($scope.data.output_type == 'HTML') {
-        $scope.htmlOutput = rawOutput;
+        if ($scope.config.allowUnsafeOutput) {
+          $scope.htmlOutput = $sce.trustAsHtml(rawOutput);
+        } else {
+          $scope.htmlOutput = rawOutput;
+        }
         $scope.formattedAvailable = true;
         $scope.showFormatted = true;
       } else if ($scope.data.output_type == 'JSON') {
