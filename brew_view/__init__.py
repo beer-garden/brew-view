@@ -222,9 +222,9 @@ def _setup_application():
         port=config.web.port,
         url_prefix=config.web.url_prefix,
         ssl_enabled=config.web.ssl.enabled,
-        ca_cert=config.web.ssl.ca_cert,
         username=config.scheduler.auth.username,
         password=config.scheduler.auth.password,
+        ca_verify=False,
     )
 
     thrift_context = _setup_thrift_context()
