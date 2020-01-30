@@ -8,6 +8,7 @@ from mongoengine.errors import (
     NotUniqueError,
     ValidationError as MongoValidationError,
 )
+from pymongo.errors import DocumentTooLarge
 from thriftpy2.thrift import TException
 from tornado.web import HTTPError, RequestHandler
 
@@ -49,6 +50,7 @@ class BaseHandler(AuthMixin, RequestHandler):
         WaitExceededError: {"status_code": 408, "message": "Max wait time exceeded"},
         ConflictError: {"status_code": 409},
         NotUniqueError: {"status_code": 409, "message": "Resource already exists"},
+        DocumentTooLarge: {"status_code": 413, "message": "Resource too large"},
         RequestPublishException: {"status_code": 502},
         bg_utils.bg_thrift.BaseException: {
             "status_code": 502,
