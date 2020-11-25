@@ -32,7 +32,6 @@ setup(
         "apispec==0.38.0",
         "apscheduler==3.5.1",
         "bg-utils>=2.4.10",
-        "brewtils>=2.4.0",
         "prometheus_client==0.3.1",
         "tornado==5.1",
     ],
