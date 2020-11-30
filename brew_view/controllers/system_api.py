@@ -196,6 +196,27 @@ class SystemAPI(BaseHandler):
             elif op.operation == "reload":
                 with thrift_context() as client:
                     yield client.reloadSystem(system_id)
+            elif op.operation == "add" and op.path == "/instance":
+                add_instance = self.parser.parse_instance(op.value)
+
+                # We also do these checks in mongo.models.System.clean
+                # Unfortunately, they don't work very well
+                if -1 < system.max_instances < len(system.instances) + 1:
+                    raise ModelValidationError(
+                        "Unable to add instance %s to %s - would exceed "
+                        "the system instance limit of %s"
+                        % (add_instance, system, system.max_instances)
+                    )
+
+                if add_instance.name in system.instance_names:
+                    raise ModelValidationError(
+                        "Unable to add Instance %s to System %s: "
+                        "Duplicate instance names" % (add_instance, system)
+                    )
+                else:
+                    system.instances.append(add_instance)
+
+                system.deep_save()
             else:
                 error_msg = "Unsupported operation '%s'" % op.operation
                 self.logger.warning(error_msg)
