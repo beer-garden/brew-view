@@ -33,6 +33,8 @@ setup(
         "apscheduler==3.5.1",
         "bg-utils>=2.4.10",
         "prometheus_client==0.3.1",
+        "pymongo<4",
+        "pyyaml<6",
         "tornado==5.1",
     ],
     extras_require={':python_version=="2.7"': ["futures>=3.1.1"]},
