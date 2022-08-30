@@ -35,7 +35,7 @@
     "lodash": "^4.17.10",
     "metismenu": "^2.7.0",
     "moment": "^2.19.1",
-    "moment-timezone": "^0.4.0",
+    "moment-timezone": "^0.5.35",
     "object-assign": "^4.1.1",
     "objectpath": "^1.2.1",
     "startbootstrap-sb-admin-2": "^3.3.7",
