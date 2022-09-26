@@ -24,3 +24,4 @@ from brew_view.controllers.system_api import SystemAPI
 from brew_view.controllers.system_list_api import SystemListAPI
 from brew_view.controllers.token_api import TokenAPI, TokenListAPI
 from brew_view.controllers.users_api import UserAPI, UsersAPI
+from brew_view.controllers.file_api import FileListAPI, FileAPI

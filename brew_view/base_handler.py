@@ -60,6 +60,13 @@ class BaseHandler(AuthMixin, RequestHandler):
         socket.timeout: {"status_code": 504, "message": "Backend request timed out"},
     }
 
+    def get_bool_header(self, key, default_value):
+        value = self.request.headers.get(key)
+        if value is None:
+            return default_value
+
+        return str(value).lower() in ["1", "true", "t", "yes", "y"]
+
     def get_refresh_id_from_cookie(self):
         token_id = self.get_secure_cookie(self.REFRESH_COOKIE_NAME)
         if token_id:
@@ -127,20 +134,26 @@ class BaseHandler(AuthMixin, RequestHandler):
             content_type = content_type.split(";")
 
             self.request.mime_type = content_type[0]
-            if self.request.mime_type not in [
+            if self.request.mime_type in [
                 "application/json",
                 "application/x-www-form-urlencoded",
             ]:
+                # Attempt to parse out the charset and decode the body, default to utf-8
+                charset = "utf-8"
+                if len(content_type) > 1:
+                    search_result = self.charset_re.search(content_type[1])
+                    if search_result:
+                        charset = search_result.group(1)
+                self.request.charset = charset
+                self.request.decoded_body = self.request.body.decode(charset)
+            elif (
+                self.request.mime_type == "multipart/form-data"
+                and "files" in self.request.path
+            ):
+                # No need to decode the request body, we're just reading bytes
+                pass
+            else:
                 raise ModelValidationError("Unsupported or missing content-type header")
-
-            # Attempt to parse out the charset and decode the body, default to utf-8
-            charset = "utf-8"
-            if len(content_type) > 1:
-                search_result = self.charset_re.search(content_type[1])
-                if search_result:
-                    charset = search_result.group(1)
-            self.request.charset = charset
-            self.request.decoded_body = self.request.body.decode(charset)
 
     def on_finish(self):
         """Called after a handler completes processing"""
